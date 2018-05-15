@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    {% load staticfiles %}
+    <script>
+        var GLOBAL_PATH = "/assets/";
+        var current_team;
+        var loaded_channels = {};
+
+    </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <title>FLUO</title>
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin"
+          rel="stylesheet" type="text/css">
+    <link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="{% static 'loader.css' %}" rel="stylesheet">
+
+    <!-- DEMO ONLY: Function for the proper stylesheet loading according to the demo settings -->
+    <script>function _pxDemo_loadStylesheet(a, b, c) {
+        var c = c || decodeURIComponent((new RegExp(";\\s*" + encodeURIComponent("px-demo-theme") + "\\s*=\\s*([^;]+)\\s*;", "g").exec(";" + document.cookie + ";") || [])[1] || "clean"),
+            d = "rtl" === document.getElementsByTagName("html")[0].getAttribute("dir");
+        document.write(a.replace(/^(.*?)((?:\.min)?\.css)$/, '<link href="$1' + (c.indexOf("dark") !== -1 && a.indexOf("/css/") !== -1 && a.indexOf("/themes/") === -1 ? "-dark" : "") + (!d || 0 !== a.indexOf(GLOBAL_PATH) && 0 !== a.indexOf(GLOBAL_PATH) ? "" : ".rtl") + '$2" rel="stylesheet" type="text/css"' + (b ? 'class="' + b + '"' : "") + ">"))
+    }</script>
+
+    <!-- DEMO ONLY: Set RTL direction -->
+    <script>"ltr" !== document.getElementsByTagName("html")[0].getAttribute("dir") && "1" === decodeURIComponent((new RegExp(";\\s*" + encodeURIComponent("px-demo-rtl") + "\\s*=\\s*([^;]+)\\s*;", "g").exec(";" + document.cookie + ";") || [])[1] || "0") && document.getElementsByTagName("html")[0].setAttribute("dir", "rtl");</script>
+
+    <!-- DEMO ONLY: Load PixelAdmin core stylesheets -->
+    <script>
+        _pxDemo_loadStylesheet('{% static 'bootstrap.min.css' %}', 'px-demo-stylesheet-bs');
+        _pxDemo_loadStylesheet('{% static 'pixeladmin.min.css' %}', 'px-demo-stylesheet-core');
+        _pxDemo_loadStylesheet('{% static 'widgets.min.css' %}', 'px-demo-stylesheet-widgets');
+    </script>
+
+    <!-- DEMO ONLY: Load theme -->
+    <script>
+        function _pxDemo_loadTheme(a) {
+            var b = decodeURIComponent((new RegExp(";\\s*" + encodeURIComponent("px-demo-theme") + "\\s*=\\s*([^;]+)\\s*;", "g").exec(";" + document.cookie + ";") || [])[1] || "clean");
+            _pxDemo_loadStylesheet(a + b + ".min.css", "px-demo-stylesheet-theme", b)
+        }
+
+        _pxDemo_loadTheme(GLOBAL_PATH);
+    </script>
+
+    <!-- Demo assets -->
+    <script>_pxDemo_loadStylesheet('{% static 'demo.css' %}');</script>
+    <!-- / Demo assets -->
+
+    <!-- holder.js -->
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/holder/2.9.0/holder.js"></script>
+
+    <!-- Pace.js -->
+    <script src="/assets/pace.min.js"></script>
+    <script type="text/javascript" src="/assets/jquery.js"></script>
+
+    {#    <script src="{% static 'demo.js' %}"></script>#}
+    {#    <script type="text/javascript" src="{% static 'GraphParser.js' %}"></script>#}
+    {#    <script type="text/javascript" src="{% static 'infomation_getter.js' %}"></script>#}
+    {#    <script type="text/javascript" src="{% static 'init.js' %}"></script>#}
+
+
+    <script src="{% static 'demo.js' %}"></script>
+
+
+    <!-- Custom styling -->
+    <style>
+        .page-header-form .input-group-addon,
+        .page-header-form .form-control {
+            background: rgba(0, 0, 0, .05);
+        }
+    </style>
+    <!-- / Custom styling -->
+</head>
+
+<body>
+
+<!--On top Navigation Bar-->
+<nav class="navbar px-navbar">
+
+    <!--Should be a LOGO-->
+    <div class="navbar-header">
+        <a class="navbar-brand px-demo-brand" href="index.html">FLUO</a>
+    </div>
+
+    <!--Switch of left side nav bar-->
+    <button type="button" class="navbar-toggle collapsed " data-toggle="collapse" data-target="#px-demo-navbar-collapse"
+            aria-expanded="false"><i class="navbar-toggle-icon"></i></button>
+
+    <!--Top categories may not be used-->
+    {#    <div class="collapse navbar-collapse" id="px-demo-navbar-collapse">#}
+    {#        <ul class="nav navbar-nav">#}
+    {#            <li class="dropdown">#}
+    {#                <a href class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"#}
+    {#                   aria-expanded="false">Categories</a>#}
+    {#                <div class="dropdown-multi-column">#}
+    {#                    <ul class="dropdown-menu dropdown-column col-md-4">#}
+    {#                        <li class="dropdown-header">Cate1</li>#}
+    {#                        <li><a href="#">1</a></li>#}
+    {#                        <li><a href="#">2</a></li>#}
+    {#                        <li><a href="#">3</a></li>#}
+    {#                    </ul>#}
+    {#                    <ul class="dropdown-menu dropdown-column col-md-4">#}
+    {#                        <li class="dropdown-header">Cate2</li>#}
+    {#                        <li><a href="#">hello</a></li>#}
+    {#                        <li><a href="#">there</a></li>#}
+    {#                        <li><a href="#">world</a></li>#}
+    {#                    </ul>#}
+    {#                    <ul class="dropdown-menu dropdown-column col-md-4">#}
+    {#                        <li class="dropdown-header">Another cate</li>#}
+    {#                        <li><a href="#">html</a></li>#}
+    {#                        <li><a href="#">css</a></li>#}
+    {#                        <li><a href="#">java script</a></li>#}
+    {#                    </ul>#}
+    {#                </div>#}
+    {#            </li>#}
+    {#        </ul>#}
+    {##}
+    {#        <ul class="nav navbar-nav navbar-right">#}
+    {#            <li class="dropdown">#}
+    {#                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"#}
+    {#                   aria-expanded="false">#}
+    {#                    <img src="{% static '4.png' %}" alt="" class="px-navbar-image">#}
+    {#                    <span class="hidden-md">Eleven</span>#}
+    {#                </a>#}
+    {#                <ul class="dropdown-menu">#}
+    {#                    <li><a href="#">Profile</a></li>#}
+    {#                    <li><a href="#">Account</a></li>#}
+    {#                    <li><a href="#">Messages</a></li>#}
+    {#                    <li class="divider"></li>#}
+    {#                    <li><a href="pages-signin-v1.html"><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a>#}
+    {#                    </li>#}
+    {#                </ul>#}
+    {#            </li>#}
+    {#        </ul>#}
+    {#    </div>#}
+</nav>
+
+{#main content#}
+<div class="px-content">
+
+    <!--Navigation Bar-->
+    {#    <ol class="breadcrumb page-breadcrumb">#}
+    {#        <li><a href="index.html">Home</a></li>#}
+    {#        <li class="active" id="status_bar">Stats</li>#}
+    {#    </ol>#}
+
+    <!--Searching box & Filter Button-->
+
+    <div id="my_popup">
+
+        <div class="row">
+            <div class="col-md-12 text-xs-center text-md-center text-nowrap m-x-auto" onclick="$('#my_popup').popup();">
+                <h1 id="status_bar_large"><i class="page-header-icon ion-ios-pulse-strong"></i>Stats</h1>
+            </div>
+
+        </div>
+
+        <!-- Add an optional button to close the popup -->
+        <button class="my_popup_close">Close</button>
+
+    </div>
+
+
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-12 text-xs-center text-md-center text-nowrap m-x-auto" onclick="$('#my_popup').popup();">
+                <h1 id="status_bar_large"><i class="page-header-icon ion-ios-pulse-strong"></i>Stats</h1>
+            </div>
+
+        </div>
+    </div>
+
+    <!--Invisible Filter-->
+    <div id="Configuration area">
+        <div class="col-xs-12 pull-left invisible text-align-center">
+            <button type="button" id="filter_button" class="btn btn-info btn-3d" data-toggle="collapse"
+                    href="#collapseTwo"><i
+                    class="ion-gear-b" id="configuration_button"></i> Configuration
+            </button>
+        </div>
+
+        <br>
+        <div class="row">
+
+            <div class="panel panel-info">
+                <div class="panel-heading" onclick="$('#configuration_button').click()">
+                    <i class="ion-gear-b"></i>
+                    <span class="panel-title">Configuration</span>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <br>
+                                <h5 class="m-t-0">Channel</h5>
+                                <div class="m-b-2">
+                                    <select id="channel_group" class="form-control select2-info select2-example"
+                                            multiple
+                                            style="width: 100%">
+                                        <optgroup label="You need to select a team first">
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <br>
+                                <h5 class="m-t-0">Keyword</h5>
+                                <input type="text" value="CSS,Html,JavaScript"
+                                       data-role="tagsinput" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <br>
+                                <h5 class="m-t-0">Weight for Nodes</h5>
+                                <div class="clearfix" id="bs-slider-node-div">
+                                    <input id="bs-slider-node" class="slider" type="text" value="" data-slider-min="0"
+                                           data-slider-max="1"
+                                           data-slider-step="1" data-slider-value="[0,1]">
+                                    <b class="pull-xs-left">0</b>
+                                    <b class="pull-xs-right">0</b>
+                                </div>
+                                <br>
+                                <h5 class="m-t-0">Weight for Edges</h5>
+                                <div class="clearfix" id="bs-slider-edge-div">
+                                    <input id="bs-slider-edge" class="slider" type="text" value="" data-slider-min="-1"
+                                           data-slider-max="1"
+                                           data-slider-step="0.1" data-slider-value="[-1,1]">
+                                    <b class="pull-xs-left">-1</b>
+                                    <b class="pull-xs-right">1</b>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <br>
+                                <h5 class="m-t-0">Time Interval</h5>
+                                <input type="text" id="daterange-1" value="07/01/2017 - 12/01/2017"
+                                       class="form-control">
+                                <br>
+                                <h5 class="m-t-0">Value</h5>
+                                <div class="col-md-6">
+                                    <label for="switcher-info" class="switcher switcher-info">
+                                        <input type="checkbox" id="switcher-info">
+                                        <div class="switcher-indicator">
+                                            <div class="switcher-yes"><i class="fa fa-check"></i></div>
+                                            <div class="switcher-no"><i class="fa fa-close"></i></div>
+                                        </div>
+                                        Positive Only
+                                    </label>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="switcher-info2" class="switcher switcher-info">
+                                        <input type="checkbox" id="switcher-info2">
+                                        <div class="switcher-indicator">
+                                            <div class="switcher-yes"><i class="fa fa-check"></i></div>
+                                            <div class="switcher-no"><i class="fa fa-close"></i></div>
+                                        </div>
+                                        Negative Only
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="page-block m-t-0">
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-dismiss="modal" onclick="$('#filter_button').click();">
+                            Close
+                        </button>
+                        {#                    <button type="button" class="btn btn-info" onclick="get_channels()">Save changes</button>#}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <hr class="page-block m-t-0">
+
+    <div id="graph area">
+        <div class="col-xs-12 pull-left invisible text-align-center">
+            <button type="button" id="filter_button" class="btn btn-info btn-3d" data-toggle="collapse"
+                    href="#collapseGraph"><i
+                    class="ion-gear-b" id="graph_button"></i> Graph
+            </button>
+        </div>
+
+        <br>
+        <div class="row">
+
+            <div class="panel panel-info">
+                <div class="panel-heading" onclick="$('#graph_button').click()">
+                    <i class="ion-gear-b"></i>
+                    <span class="panel-title">Graph</span>
+                </div>
+                <div id="collapseGraph" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="tab-content tab-content-bordered">
+                                    <div class="tab-pane fade in active" id="drag">
+                                        <div class="row">
+
+                                            <div id="main" style="height: 700px;color: #B3B3B3">
+
+
+                                            </div>
+                                            <script type="text/javascript" src="/assets/echarts.min.js"></script>
+                                            {#                        <script type="text/javascript" src="/assets/jquery.js"></script>#}
+                                            <script type="text/javascript" src="/assets/dataTool.js"></script>
+                                            <script type="text/javascript">
+                                                {#draw('123');#}
+                                                {#console.log('Drawed')#}
+                                            </script>
+                                            <div class="fixed-bottom" id="piechart">
+                                                <div class="pull-right" style="width : 130px; margin-top:540px">
+                                                    <div class="panel box">
+                                                        <div class="box-row">
+                                                            <div class="box-cell p-x-2 p-y-1 bg-black text-xs-center font-size-11 font-weight-semibold">
+                                                                <i class="fa fa-globe"></i>&nbsp;&nbsp;NODES
+                                                            </div>
+                                                        </div>
+                                                        <div class="box-row float-right"
+                                                        ">
+                                                        <div class="box-cell p-y-2 ">
+                                                            <div class="easy-pie-chart" data-suffix="P"
+                                                                 id="easy-pie-chart-1"><span
+                                                                    class="font-size-14 font-weight-light"></span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pull-right" style="width : 130px; margin-top:540px">
+                                                <div class="panel box">
+                                                    <div class="box-row">
+                                                        <div class="box-cell p-x-2 p-y-1 bg-black text-xs-center font-size-11 font-weight-semibold">
+                                                            <i class="fa fa-flash"></i>&nbsp;&nbsp;LINKS
+                                                        </div>
+                                                    </div>
+                                                    <div class="box-row">
+                                                        <div class="box-cell p-y-2">
+                                                            <div class="easy-pie-chart" data-suffix="L"
+                                                                 id="easy-pie-chart-2"><span
+                                                                    class="font-size-14 font-weight-light"></span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                {#                <div class="tab-pane fade" id="organized">#}
+                                {#                    <div class="row">#}
+                                {#                        <div id="mai" style="height: 700px;color: #B3B3B3"></div>#}
+                                {#                        <script type="text/javascript">#}
+                                {#                            console.log('loaded')#}
+                                {#                            var dom1 = document.getElementById("mai");#}
+                                {#                            var myChart1 = echarts.init(dom1);#}
+                                {#                            var app = {};#}
+                                {#                            option = null;#}
+                                {#                            app.title = 'MainFrame2';#}
+                                {#                            myChart1.showLoading();#}
+                                {#                            $.get('/assets/les-miserables.gexf', function (xml) {#}
+                                {#                                myChart1.hideLoading();#}
+                                {#                                var graph = echarts.dataTool.gexf.parse(xml);#}
+                                {#                                var categories = [];#}
+                                {#                                for (var i = 0; i < 9; i++) {#}
+                                {#                                    categories[i] = {#}
+                                {#                                        name: 'Channel' + (i + 1)#}
+                                {#                                    };#}
+                                {#                                }#}
+                                {#                                graph.nodes.forEach(function (node) {#}
+                                {#                                    node.itemStyle = null;#}
+                                {#                                    node.value = node.symbolSize;#}
+                                {#                                    node.symbolSize /= 1.5;#}
+                                {#                                    node.label = {#}
+                                {#                                        normal: {#}
+                                {#                                            show: node.symbolSize > 30#}
+                                {#                                        }#}
+                                {#                                    };#}
+                                {#                                    node.category = node.attributes.modularity_class;#}
+                                {#                                });#}
+                                {#                                option = {#}
+                                {#                                    title: {#}
+                                {#                                        top: 'bottom',#}
+                                {#                                        left: 'right'#}
+                                {#                                    },#}
+                                {#                                    tooltip: {},#}
+                                {#                                    legend: [{#}
+                                {#                                        // selectedMode: 'single',#}
+                                {#                                        data: categories.map(function (a) {#}
+                                {#                                            return a.name;#}
+                                {#                                        })#}
+                                {#                                    }],#}
+                                {#                                    animationDuration: 1500,#}
+                                {#                                    animationEasingUpdate: 'quinticInOut',#}
+                                {#                                    series: [#}
+                                {#                                        {#}
+                                {#                                            name: 'Les Miserables',#}
+                                {#                                            type: 'graph',#}
+                                {#                                            layout: 'none',#}
+                                {#                                            data: graph.nodes,#}
+                                {#                                            links: graph.links,#}
+                                {#                                            categories: categories,#}
+                                {#                                            roam: true,#}
+                                {#                                            label: {#}
+                                {#                                                normal: {#}
+                                {#                                                    position: 'right',#}
+                                {#                                                    formatter: '{b}'#}
+                                {#                                                }#}
+                                {#                                            },#}
+                                {#                                            lineStyle: {#}
+                                {#                                                normal: {#}
+                                {#                                                    color: 'source',#}
+                                {#                                                    curveness: 0.3#}
+                                {#                                                }#}
+                                {#                                            }#}
+                                {#                                        }#}
+                                {#                                    ]#}
+                                {#                                };#}
+                                {#                                myChart1.setOption(option);#}
+                                {#                            }, 'xml');#}
+                                {#                            if (option && typeof option === "object") {#}
+                                {#                                myChart1.setOption(option, true);#}
+                                {#                            }#}
+                                {#                        </script>#}
+                                {#                    </div>#}
+                                {#                </div>#}
+                                {#                <div class="tab-pane fade" id="cir">#}
+                                {#                    <div class="row">#}
+                                {#                        <div id="ma" style="height: 700px;color: #B3B3B3"></div>#}
+                                {#                        <script type="text/javascript">#}
+                                {#                            var dom2 = document.getElementById("ma");#}
+                                {#                            var myChart2 = echarts.init(dom2);#}
+                                {#                            var app = {};#}
+                                {#                            option = null;#}
+                                {#                            app.title = 'MainFrame';#}
+                                {#                            myChart2.showLoading();#}
+                                {#                            $.get('/assets/les-miserables.gexf', function (xml) {#}
+                                {#                                myChart2.hideLoading();#}
+                                {#                                var graph = echarts.dataTool.gexf.parse(xml);#}
+                                {#                                var categories = [];#}
+                                {#                                for (var i = 0; i < 9; i++) {#}
+                                {#                                    categories[i] = {#}
+                                {#                                        name: 'Channel ' + (i + 1)#}
+                                {#                                    };#}
+                                {#                                }#}
+                                {#                                graph.nodes.forEach(function (node) {#}
+                                {#                                    node.itemStyle = null;#}
+                                {#                                    node.value = node.symbolSize;#}
+                                {#                                    node.symbolSize /= 1.5;#}
+                                {#                                    node.label = {#}
+                                {#                                        normal: {#}
+                                {#                                            show: node.symbolSize > 10#}
+                                {#                                        }#}
+                                {#                                    };#}
+                                {#                                    node.category = node.attributes.modularity_class;#}
+                                {#                                });#}
+                                {#                                option = {#}
+                                {#                                    title: {#}
+                                {#                                        top: 'bottom',#}
+                                {#                                        left: 'right'#}
+                                {#                                    },#}
+                                {#                                    tooltip: {},#}
+                                {#                                    legend: [{#}
+                                {#                                        // selectedMode: 'single',#}
+                                {#                                        data: categories.map(function (a) {#}
+                                {#                                            return a.name;#}
+                                {#                                        })#}
+                                {#                                    }],#}
+                                {#                                    animationDurationUpdate: 1500,#}
+                                {#                                    animationEasingUpdate: 'quinticInOut',#}
+                                {#                                    series: [#}
+                                {#                                        {#}
+                                {#                                            name: 'Les Miserables',#}
+                                {#                                            type: 'graph',#}
+                                {#                                            layout: 'circular',#}
+                                {#                                            circular: {#}
+                                {#                                                rotateLabel: true#}
+                                {#                                            },#}
+                                {#                                            data: graph.nodes,#}
+                                {#                                            links: graph.links,#}
+                                {#                                            categories: categories,#}
+                                {#                                            roam: true,#}
+                                {#                                            label: {#}
+                                {#                                                normal: {#}
+                                {#                                                    position: 'right',#}
+                                {#                                                    formatter: '{b}'#}
+                                {#                                                }#}
+                                {#                                            },#}
+                                {#                                            lineStyle: {#}
+                                {#                                                normal: {#}
+                                {#                                                    color: 'source',#}
+                                {#                                                    curveness: 0.3#}
+                                {#                                                }#}
+                                {#                                            }#}
+                                {#                                        }#}
+                                {#                                    ]#}
+                                {#                                };#}
+                                {#                                myChart2.setOption(option);#}
+                                {#                            }, 'xml');#}
+                                {#                            if (option && typeof option === "object") {#}
+                                {#                                myChart2.setOption(option, true);#}
+                                {#                            }#}
+                                {##}
+                                {##}
+                                {##}
+                                {#                        </script>#}
+                                {#                    </div>#}
+                                {#                </div>#}
+                            </div>
+
+
+                            <div class="px-sidebar-right" id="sidebar-vertex" style="position: absolute; z-index: 10;"
+                                 data-width="300">
+
+                                <button type="button" class="close position-relative" aria-label="Close">
+                                    <span aria-hidden="true" onclick="open_sidebar('', 'sidebar-vertex')">&times;</span>
+                                </button>
+                                <div class="px-sidebar-content">
+                                    <div class="loader invisible"></div>
+                                    <div class="panel-heading p-x-1">
+                                        <span class="panel-title">Node Info</span>
+
+                                    </div>
+                                    <div class="col-md-12" id="person_profile">
+                                        <div class="page-profile-v2-subheader page-block p-y-3"
+                                             style="width:299px;height:299px;">
+                                            <div class="text-xs-center"><img src="{% static '3.png' %}" alt=""
+                                                                             class="page-profile-v2-avatar border-round image"
+                                                                             style="width:200px;height:200px;"></div>
+                                            <h1 class="font-size-24 text-xs-center m-y-1 name">Xun Lu</h1>
+                                            <h3 class="m-t-0 m-b-1 text-xs-center text-muted font-weight-normal id">
+                                                @neversaidthat</h3>
+                                        </div>
+
+                                        <div class="panel panel-transparent">
+                                            <div class="panel-heading p-x-1">
+                                                <span class="panel-title">Statistics</span>
+                                            </div>
+                                            <div class="list-group m-y-1">
+                                                <a href="#" class="list-group-item p-x-1 b-a-0 message_number"><strong>126</strong>
+                                                    Messages</a>
+                                                <a href="#"
+                                                   class="list-group-item p-x-1 b-a-0 weight"><strong>3.75</strong>
+                                                    Weights</a>
+                                                <a href="#" class="list-group-item p-x-1 b-a-0 mention_number"><strong>73</strong>
+                                                    Mentions</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel panel-transparent">
+                                            <div class="panel-heading p-x-1">
+                                                <span class="panel-title">Posts</span>
+                                            </div>
+                                            <div class="message_list">
+                                                <div class="widget-messages-alt-item ">
+                                                    <img src="/assets/3.png" alt="" class="widget-messages-alt-avatar">
+                                                    <div>Ok</div>
+                                                    <div class="widget-messages-alt-description">from <a href="#">Xun
+                                                        Lu</a></div>
+                                                    <div class="widget-messages-alt-date">09-02-2017</div>
+                                                </div>
+
+                                                <div class="widget-messages-alt-item">
+                                                    <img src="/assets/3.png" alt="" class="widget-messages-alt-avatar">
+                                                    I will finish all the assignments one day before deadline.
+                                                    <div class="widget-messages-alt-description">from <a href="#">Robert
+                                                        Jang</a>
+                                                    </div>
+                                                    <div class="widget-messages-alt-date">08-31-2017</div>
+                                                </div>
+
+                                                <div class="widget-messages-alt-item">
+                                                    <img src="/assets/3.png" alt="" class="widget-messages-alt-avatar">
+                                                    I will finish all the assignments one week before deadline.
+                                                    <div class="widget-messages-alt-description">from <a href="#">Robert
+                                                        Jang</a>
+                                                    </div>
+                                                    <div class="widget-messages-alt-date">08-21-2017</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-a-4">
+                                        <button type="button" class="btn" data-toggle="sidebar"
+                                                data-target="#sidebar-vertex"
+                                                onclick="open_sidebar('', 'sidebar-vertex')">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="px-sidebar-right" id="sidebar-edge" style="position: absolute; z-index: 10;"
+                                 data-width="300">
+                                <div class="loader invisible"></div>
+                                <button type="button" class="close position-relative" aria-label="Close">
+                                    <span aria-hidden="true" onclick="open_sidebar('', 'sidebar-edge')">&times;</span>
+                                </button>
+                                <div class="px-sidebar-content">
+                                    <div class="panel-heading p-x-1">
+                                        <span class="panel-title">Link Info</span>
+                                    </div>
+                                    <div class="col-md-12" id="edge_profile">
+                                        <div class="panel panel-transparent">
+                                            <div class="panel-heading p-x-1">
+                                                <span class="panel-title">Link</span>
+                                            </div>
+                                            <br>
+                                            <div class="col-md-6">
+                                                <div class="panel panel-transparent">
+                                                    <div class="text-xs-center "><img id="node_1_image"
+                                                                                      src="/assets/1.jpg"
+                                                                                      onerror="standby('node_1_image')"
+                                                                                      class="node1_image page-profile-v2-avatar border-round"
+                                                                                      style="width:100px;height:100px;"
+                                                                                      alt="Picture failed"></div>
+                                                    <h1 class="font-size-18 text-xs-center m-y-1 node1_name">Doge
+                                                        One</h1>
+                                                    <h3 class="node1_id font-size-18 m-t-0 m-b-1 text-xs-center text-muted font-weight-normal">
+                                                        @lookinat</h3>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="panel panel-transparent">
+                                                    <div class="text-xs-center"><img id="node_2_image"
+                                                                                     src="/assets/2.jpg"
+                                                                                     onerror="standby('node_2_image')"
+                                                                                     class="node2_image page-profile-v2-avatar border-round"
+                                                                                     style="width:100px;height:100px;">
+                                                    </div>
+                                                    <h1 class="font-size-18 text-xs-center m-y-1 node2_name">Doge
+                                                        two</h1>
+                                                    <h3 class="node2_id font-size-18 m-t-0 m-b-1 text-xs-center text-muted font-weight-normal">
+                                                        @coolestdog</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="panel panel-transparent">
+                                            <div class="panel-heading p-x-1">
+                                                <span class="panel-title">Statistics</span>
+                                            </div>
+                                            <div class="list-group m-y-1">
+                                                <a href="#" class="list-group-item p-x-1 b-a-0 message_number"><strong>126</strong>
+                                                    Messages</a>
+                                                <a href="#"
+                                                   class="list-group-item p-x-1 b-a-0 weight"><strong>3.75</strong>
+                                                    Weights</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel panel-transparent">
+                                            <div class="panel-heading p-x-1">
+                                                <span class="panel-title">Posts</span>
+                                            </div>
+                                            <div class="message_list">
+                                                <div class="widget-chat-item left">
+                                                    <img src="/assets/1.jpg" alt="" class="widget-chat-avatar">
+                                                    <span class="widget-chat-date pull-right">07-24-2017</span>
+                                                    <div class="widget-chat-heading"><a href="#" title="">Doge One</a>
+                                                    </div>
+                                                    <div class="widget-chat-text">
+                                                        Wolf. Wolf. Wolf. Wolf. Wolf.
+                                                    </div>
+                                                </div>
+                                                <div class="widget-chat-item right">
+                                                    <img src="/assets/2.jpg" alt="" class="widget-chat-avatar">
+                                                    <span class="widget-chat-date pull-right">07-24-2017</span>
+                                                    <div class="widget-chat-heading"><a href="#" title="">Doge Two</a>
+                                                    </div>
+                                                    <div class="widget-chat-text">
+                                                        Wolf. Wolf. Wolf. Wolf.
+                                                    </div>
+                                                </div>
+                                                <div class="widget-chat-item left">
+                                                    <img src="/assets/1.jpg" alt="" class="widget-chat-avatar">
+                                                    <span class="widget-chat-date pull-right">07-14-2017</span>
+                                                    <div class="widget-chat-heading"><a href="#" title="">Doge One</a>
+                                                    </div>
+                                                    <div class="widget-chat-text">
+                                                        Wolf. Wolf. Wolf.
+                                                    </div>
+                                                </div>
+                                                <div class="widget-chat-item right">
+                                                    <img src="/assets/2.jpg" alt="" class="widget-chat-avatar">
+                                                    <span class="widget-chat-date pull-right">07-14-2017</span>
+                                                    <div class="widget-chat-heading"><a href="#" title="">Doge Two 21321
+                                                        321 3213
+                                                        213
+                                                        213 123 213 12 321 </a></div>
+                                                    <div class="widget-chat-text">
+                                                        Wolf. Wolf.
+                                                    </div>
+                                                </div>
+                                                <div class="widget-chat-item left">
+                                                    <img src="/assets/1.jpg" alt="" class="widget-chat-avatar">
+                                                    <span class="widget-chat-date pull-right">07-04-2017</span>
+                                                    <div class="widget-chat-heading"><a href="#" title="">Doge One</a>
+                                                    </div>
+                                                    <div class="widget-chat-text">
+                                                        Wolf.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-a-4">
+                                        <button type="button" class="btn" data-toggle="sidebar"
+                                                data-target="#sidebar-edge"
+                                                onclick="open_sidebar('', 'sidebar-edge')">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="page-block m-t-0">
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal" onclick="$('#filter_button').click();">
+                        Close
+                    </button>
+                    {#                    <button type="button" class="btn btn-info" onclick="get_channels()">Save changes</button>#}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{#    <button type="button" class="btn" data-toggle="sidebar" onclick="open_sidebar('sidebar-edge', 'sidebar-vertex')">#}
+{#        Vertex#}
+{#    </button>#}
+{##}
+{#    <button type="button" class="btn" data-toggle="sidebar" onclick="open_sidebar('sidebar-vertex', 'sidebar-edge')">#}
+{#        Edge#}
+{#    </button>#}
+
+<!--Main Frame Nav Bar-->
+
+{#    <div id="graph_area">#}
+{##}
+{##}
+{##}
+{#        <!--Main Frame Graphs-->#}
+{##}
+{#    </div>#}
+<br>
+
+{#    <hr class="page-block m-t-0">#}
+
+
+<hr class="page-block m-t-0">
+
+<!--Invisible more things-->
+<div class="row" id="schedule">
+    <div class="col-md-6" data-accent="(panel-group-success)||(panel-group-dark)">
+        <div class="panel-group panel-group-success" id="accordion-example-success">
+            <div class="panel">
+                <div class="panel-heading">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                       data-parent="#accordion-example-success"
+                       href="#collapseThree-success">
+                        <i class="panel-title-icon fa fa-bullhorn"></i>Update Log
+                    </a>
+                </div>
+                <div id="collapseThree-success" class="panel-collapse collapse">
+                    <div id="support-tickets" class="ps-block" style="height: 300px">
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-info pull-right">In Progress</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Whole new UI design
+                            </a>
+                            <span class="widget-support-tickets-info">Done by
+                            <a href="#" title="">Justin</a> in December</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Graph transfer
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Justin</a> in November</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-warning pull-right">Abandoned</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Data classified version 3.0
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Hall</a> in November</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Server online
+                            </a>
+                            <span class="widget-support-tickets-info">Opened by <a
+                                    href="#">Boris</a> in November</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Data classified version 2.0
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Hall</a> in November</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Data classified version 1.0
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#" title="">Glimer</a> in October</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-warning pull-right">Abandoned</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Chart customization problem
+                            </a>
+                            <span class="widget-support-tickets-info">Opened by <a
+                                    href="#">Justin</a> in October</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                <i class="fa fa-warning text-danger"></i> Website version 1.0
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Justin</a> in October</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Get the raw data
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Boris</a> in October</span>
+                        </div>
+
+                        <div class="widget-support-tickets-item">
+                            <span class="label label-success pull-right">Completed</span>
+                            <a href="#" title="" class="widget-support-tickets-title">
+                                Project started
+                            </a>
+                            <span class="widget-support-tickets-info">Done by <a
+                                    href="#">Fluo Group</a> in September</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6" data-accent="(panel-group-success)||(panel-group-dark)">
+        <div class="panel-group panel-group-warning" id="accordion-example-success2">
+            <div class="panel">
+                <div class="panel-heading">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                       data-parent="#accordion-example-success"
+                       href="#collapseThree-success2">
+                        <i class="panel-title-icon fa fa-fire text-danger"></i>Comments
+                        From Experts
+                    </a>
+                </div>
+                <div id="collapseThree-success2" class="panel-collapse collapse">
+                    <div id="comments" class="ps-block tab-pane fade in active" style="height: 300px">
+                        <div class="widget-comments-item">
+                            <img src="/assets/5.png" alt="" class="widget-comments-avatar">
+                            <div class="widget-comments-header">
+                                <a href="https://twitter.com/realDonaldTrump" title="">Donald Trump</a>
+                            </div>
+                            <div class="widget-comments-text">
+                                Fluo project is fucking awesome!!!
+                            </div>
+                            <div class="widget-comments-footer">
+                                2 hours ago
+                                <div class="pull-right">
+                                    <a href="#"><i class="fa fa-heart"></i>&nbsp;Yay</a>
+                                    <a href="#"><i class="fa fa-times"></i>&nbsp;Nah</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="widget-comments-item">
+                            <img src="/assets/6.png" alt="" class="widget-comments-avatar">
+                            <div class="widget-comments-header">
+                                <a href="https://twitter.com/barackobama" title="">Barack Obama</a>
+                            </div>
+                            <div class="widget-comments-text">
+                                I hate to say this, but this time Trump is right.
+                            </div>
+                            <div class="widget-comments-footer">
+                                2 hours ago
+                                <div class="pull-right">
+                                    <a href="#"><i class="fa fa-heart"></i>&nbsp;Yay</a>
+                                    <a href="#"><i class="fa fa-times"></i>&nbsp;Nah</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<footer class="px-footer px-footer-bottom p-t-0">
+    <div class="box m-a-0 bg-transparent" id="footer">
+        <div class="box-cell col-md-3 p-t-3">
+            <h5 class="m-t-0 m-b-1 font-size-13">About Us</h5>
+            <a href="#">Who we are</a><br>
+            <a href="#">Join us</a><br>
+            <a href="#">Subscribe</a><br>
+        </div>
+        <div class="box-cell col-md-3 p-t-3">
+            <h5 class="m-t-0 m-b-1 font-size-13">Help</h5>
+            <a href="#">Support Center</a><br>
+            <a href="#">Terms of Use</a><br>
+            <a href="#">Privacy Policy</a><br>
+        </div>
+        <div class="box-cell col-md-3 p-t-3">
+            <h5 class="m-t-0 m-b-1 font-size-13">Products</h5>
+            <a href="#">Popular</a><br>
+            <a href="#">Most rated</a><br>
+            <a href="#">Recent</a><br>
+        </div>
+        <div class="box-cell col-md-3 p-t-3 valign-middle">
+            <a href="#" class="display-block m-b-1 text-nowrap"><i class="fa fa-twitter"></i>&nbsp;&nbsp;@justinhyx</a>
+            <a href="#" class="display-block m-b-1 text-nowrap"><i
+                    class="fa fa-facebook"></i>&nbsp;&nbsp;JustinHu</a>
+            <a href="#" class="display-block text-nowrap"><i class="fa fa-envelope"></i>&nbsp;&nbsp;11510225@mail.sustc.edu.cn</a>
+        </div>
+    </div>
+
+    <hr class="page-wide-block">
+
+    <span class="text-muted">Copyright © 2017 <strong>Fluo</strong> Boris/Justin/Glimer/Hall/William. All rights reserved.</span>
+</footer>
+
+<!-- ==============================================================================
+|
+|  SCRIPTS
+|
+=============================================================================== -->
+
+<!-- jQuery -->
+{#<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>#}
+
+<script src="{% static 'bootstrap.min.js' %}"></script>
+{#<script src="/assets/jquery.min.js"></script>#}
+<script src="{% static 'pixeladmin.min.js' %}"></script>
+
+
+<script type="text/javascript" src="{% static 'bootstrap.min.js' %}"></script>
+{#<script type="text/javascript" src="{% static 'jquery.min.js' %}"></script>#}
+<script type="text/javascript" src="{% static 'pixeladmin.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'GraphParser.js' %}"></script>
+<script type="text/javascript" src="{% static 'infomation_getter.js' %}"></script>
+<script type="text/javascript" src="{% static 'init.js' %}"></script>
+
+
+<script>
+    // -------------------------------------------------------------------------
+    // Initialize DEMO sidebar
+
+    $(function () {
+        pxDemo.initializeDemoSidebar();
+        $('#px-demo-sidebar').pxSidebar();
+        pxDemo.initializeDemo();
+    });
+</script>
+
+<script type="text/javascript">
+    // -------------------------------------------------------------------------
+    // Initialize DEMO
+
+    $(function () {
+        var file = String(document.location).split('/').pop();
+
+        // Remove unnecessary file parts
+        file = file.replace(/(\.html).*/i, '$1');
+
+        if (!/.html$/i.test(file)) {
+            file = 'index.html';
+        }
+
+        // Activate current nav item
+        $('body > .px-nav')
+            .find('.px-nav-item > a[href="' + file + '"]')
+            .parent()
+            .addClass('active');
+
+        $('body > .px-nav').pxNav();
+        $('body > .px-footer').pxFooter();
+
+        $('#navbar-notifications').perfectScrollbar();
+        $('#navbar-messages').perfectScrollbar();
+    });
+</script>
+
+<script>
+    // -------------------------------------------------------------------------
+    // Initialize Select2
+
+    $(function () {
+        $('.select2-example').select2({
+            placeholder: 'No team selected',
+        });
+    });
+
+    // -------------------------------------------------------------------------
+    // Initialize easy pie charts
+
+    $(function () {
+
+
+        var data = [
+            pxDemo.getRandomData(1000, 1),
+            pxDemo.getRandomData(100, 1),
+            pxDemo.getRandomData(64, 1),
+        ];
+
+
+        {#$('#easy-pie-chart-3')#}
+        {#    .attr('data-percent', (data[2] / 64) * 100)#}
+        {#    .attr('data-max-value', 64)#}
+        {#    .easyPieChart($.extend({}, config, {barColor: colors[2]}));#}
+    });
+
+
+    // -------------------------------------------------------------------------
+    // Initialize scrollbars
+
+    $(function () {
+        $('#support-tickets').perfectScrollbar();
+        $('#comments').perfectScrollbar();
+        $('#threads').perfectScrollbar();
+    });
+
+    // -------------------------------------------------------------------------
+    // Initialize Date Range Picker
+
+    $(function () {
+        {#$('#daterange-1').daterangepicker();#}
+        $('#daterange-1').daterangepicker({
+            "autoApply": true,
+            locale: {cancelLabel: 'Clear'},
+            {#"startDate": "12/13/2017",#}
+            {#"endDate": "12/19/2017"#}
+        }, function (start, end, label) {
+            console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+        });
+
+    });
+
+    // -------------------------------------------------------------------------
+    // Initialize Seiyria Bootstrap Slider
+
+    $(function () {
+
+        $('#bs-slider-node').slider({
+            reversed: $('html').attr('dir') === 'rtl'
+        });
+
+        $('#bs-slider-edge').slider({
+            reversed: $('html').attr('dir') === 'rtl'
+        });
+
+
+    });
+
+    // -------------------------------------------------------------------------
+    // Initialize Detail Bar
+
+    $(function () {
+        $('#px-nav-off-canvas-right').pxNav({
+            storeState: false,
+        });
+    });
+
+    // -------------------------------------------------------------------------
+    // Internal point
+
+    $(function () {
+        $('#sidebar-pxnavbar').pxSidebar();
+    });
+
+    // -------------------------------------------------------------------------
+    // Initialize page components
+
+    $(function () {
+        $('#profile-tabs').pxTabResize();
+    });
+
+    init();
+</script>
+
+{#<script type="text/javascript" src="{% static 'init.js' %}"></script>#}
+
+<!-- Include jQuery -->
+{#<script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>#}
+
+<!-- Include jQuery Popup Overlay -->
+<script src="https://cdn.rawgit.com/vast-engineering/jquery-popup-overlay/1.7.13/jquery.popupoverlay.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        // Initialize the plugin
+        $('#my_popup').popup();
+
+    });
+</script>
+
+
+</body>
+</html>

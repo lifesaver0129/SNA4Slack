@@ -1,0 +1,37 @@
+{
+  "F2870T12": [
+    {
+      "weight": 0.3866666666666666,
+      "channel":"CH51"
+    },
+    {
+      "talk": [
+        {
+          "message": "Thanks a lot @alexbrand",
+          "user_name": "lokendra",
+          "time": "Oct 6, 2016 21:24   "
+        }
+      ]
+    }
+  ],
+  "F3045T2684": [
+    {
+      "weight": 0.5576923076923077,
+      "channel":"CH51"
+    },
+    {
+      "talk": [
+        {
+          "message": "@ameer.deen , we are trying to hit beta in late Q3 of this year, but we have been short in resources for development. we welcome more folks looking to contribute",
+          "user_name": "mmichael",
+          "time": "Jun 13, 2017 20:30   "
+        },
+        {
+          "message": "makes sense. thanks @ameer.deen",
+          "user_name": "mmichael",
+          "time": "Jun 13, 2017 22:44   "
+        }
+      ]
+    }
+  ]
+}
